@@ -48,6 +48,18 @@ NODE_PATH=/opt/node22/lib/node_modules node preview.cjs 3.4 8.9 19 28.6
 
 ## Texto sugerido para la publicación
 
+**Versión breve (recomendada):**
+
+> Son las 03:14 y un cliente pregunta si te queda habitación. Si nadie contesta,
+> esa reserva se va a la competencia.
+>
+> Monto el sistema completo: **página web** con reserva directa, **CRM** donde
+> entra todo solo y **agentes de WhatsApp** que atienden y reservan 24/7.
+>
+> Escribe **DEMO** en los comentarios. 👇
+
+**Versión larga:**
+
 > Son las 03:14. Un cliente pregunta si te queda habitación para el finde.
 > Si nadie contesta, esa reserva se va a la competencia.
 >
