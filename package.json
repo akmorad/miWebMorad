@@ -1,0 +1,23 @@
+{
+  "name": "rh-mint-sniper",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sniper de mints NFT para Robinhood Chain (EVM). Clave privada cifrada localmente, multi-RPC, pre-firma.",
+  "type": "module",
+  "bin": {
+    "rh-sniper": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "setup": "node src/index.js setup",
+    "snipe": "node src/index.js snipe",
+    "doctor": "node src/index.js doctor",
+    "test": "node test/run.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ethers": "^6.13.4"
+  }
+}
