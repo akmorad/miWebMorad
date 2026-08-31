@@ -61,6 +61,21 @@ El resultado ya está en el repositorio, así que solo hace falta ejecutarlo si 
 retocan las escenas. Al ser vectoriales, pesan pocos kilobytes y se ven nítidas
 en cualquier pantalla.
 
+## Vídeo para redes
+
+`tools/video/` genera un vídeo vertical de 1080×1920 con la demo, listo para
+Instagram Reels o Stories: recorrido por la home, flujo de reserva completo,
+agente de WhatsApp y tarjeta de cierre.
+
+```bash
+./tools/video/render.sh          # 18 s a 30 fps -> hotel-almara-reel.mp4
+./tools/video/render.sh 12 30    # otra duración
+```
+
+Cada fotograma se calcula solo a partir de su número (`fotograma.html?f=N`), así
+que el render es reproducible y se paraleliza. Para cambiar los rótulos o los
+tiempos, edita las constantes `GUION`, `PARADAS` y `ROTULOS` de `fotograma.html`.
+
 ## Estructura
 
 ```
@@ -69,7 +84,7 @@ guias/            cuatro artículos de guía local
 assets/css/       almara.css — sistema visual completo
 assets/js/        almara.js (común) y reserva.js (flujo de reserva)
 assets/img/       15 ilustraciones SVG originales
-tools/            generador de las ilustraciones
+tools/            generador de las ilustraciones y del vídeo para redes
 ```
 
 ## Decisiones técnicas

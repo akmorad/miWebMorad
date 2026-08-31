@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Fotograma</title>
+<style>
+  @font-face { font-family: 'Cormorant Garamond'; src: local('Cormorant Garamond'); }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+  body {
+    background:
+      radial-gradient(120% 70% at 50% 8%, #fbf3e6 0%, #f1e0c8 46%, #e2c8a4 100%);
+    font-family: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+    color: #2b211c;
+  }
+  /* Resplandor cálido detrás del móvil, como la luz del hero */
+  .brillo {
+    position: absolute; left: 50%; top: 300px; width: 1200px; height: 1200px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(226,138,86,.34) 0%, rgba(226,138,86,0) 62%);
+  }
+  .grano {
+    position: absolute; inset: 0; opacity: .5; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .42 0 0 0 0 .29 0 0 0 0 .18 0 0 0 .32 -.12'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------------------------------------------------------- Rótulos --- */
+  .rotulo { position: absolute; left: 0; right: 0; text-align: center; padding: 0 80px; }
+  .rotulo__ante {
+    font-size: 26px; letter-spacing: .42em; text-transform: uppercase;
+    color: #b45633; margin-bottom: 22px;
+  }
+  .rotulo__titulo {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 86px; line-height: 1.06; font-weight: 400; color: #2b211c;
+  }
+  .rotulo__titulo em { font-style: italic; color: #a94f2d; }
+  .rotulo__pie { font-size: 30px; color: #7d6a5d; margin-top: 20px; letter-spacing: .04em; }
+
+  /* ------------------------------------------------------------ Móvil --- */
+  .movil {
+    position: absolute; left: 50%; top: 0;
+    transform-origin: top center;
+    background: #241b16;
+    border-radius: 62px;
+    padding: 14px;
+    box-shadow: 0 40px 90px rgba(70, 45, 30, .38), 0 8px 24px rgba(70, 45, 30, .22);
+  }
+  .movil__pantalla {
+    position: relative; width: 390px; height: 844px;
+    border-radius: 48px; overflow: hidden; background: #faf5ee;
+  }
+  .movil__pantalla iframe { width: 390px; height: 844px; border: 0; display: block; }
+  .movil__isla {
+    position: absolute; left: 50%; top: 12px; transform: translateX(-50%);
+    width: 104px; height: 30px; border-radius: 16px; background: #241b16; z-index: 5;
+  }
+
+  /* -------------------------------------------------------- Pie fijo --- */
+  .firma {
+    position: absolute; left: 0; right: 0; bottom: 74px; text-align: center;
+    font-size: 27px; letter-spacing: .34em; text-transform: uppercase; color: #8a7365;
+  }
+
+  /* ------------------------------------------------------ Cierre final --- */
+  .cierre { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; padding: 0 90px; }
+  .cierre__marca {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 130px; letter-spacing: .1em; text-transform: uppercase; line-height: 1;
+  }
+  .cierre__lugar { font-size: 28px; letter-spacing: .46em; text-transform: uppercase; color: #a08872; margin-top: 20px; }
+  .cierre__filete { width: 90px; height: 2px; background: #c2694a; margin: 54px auto; }
+  .cierre__pregunta {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 74px; line-height: 1.16; color: #2b211c;
+  }
+  .cierre__pregunta em { font-style: italic; color: #a94f2d; }
+  .cierre__cta {
+    margin-top: 56px; display: inline-block;
+    background: #c2694a; color: #faf5ee;
+    font-size: 30px; letter-spacing: .26em; text-transform: uppercase;
+    padding: 30px 62px; border-radius: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="brillo"></div>
+
+<div class="movil" id="movil">
+  <div class="movil__pantalla">
+    <div class="movil__isla"></div>
+    <iframe id="marco" src="about:blank"></iframe>
+  </div>
+</div>
+
+<div class="rotulo" id="rotulo"></div>
+<div class="firma" id="firma">Diseño web · Morad</div>
+<div class="cierre" id="cierre" style="display:none"></div>
+<div class="grano"></div>
+
+<script>
+/* ==========================================================================
+   Renderizador de fotogramas.
+   Cada fotograma se calcula solo a partir de su número, así que el resultado
+   es idéntico en cada ejecución y se puede renderizar en paralelo.
+   ========================================================================== */
+var FPS = 30;
+var f = Number(new URLSearchParams(location.search).get('f') || 0);
+var t = f / FPS;
+
+/* -------------------------------------------------------- Interpolación --- */
+function tramo(a, b) { return Math.min(1, Math.max(0, (t - a) / (b - a))); }
+function suave(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+function entre(a, b, k) { return a + (b - a) * k; }
+/** Opacidad de un rótulo que entra en "a", sale en "b" y funde en "d". */
+function visible(a, b, d) {
+  d = d || 0.45;
+  return Math.min(tramo(a, a + d), 1 - tramo(b - d, b));
+}
+
+/* ------------------------------------------------------------ Guion --- */
+var GUION = [
+  { fin: 2.5,  escena: 'inicio' },
+  { fin: 6.6,  escena: 'recorrido' },
+  { fin: 11.0, escena: 'reserva' },
+  { fin: 14.0, escena: 'whatsapp' },
+  { fin: 18.0, escena: 'cierre' },
+];
+var escena = GUION.find(function (e) { return t < e.fin; });
+escena = escena ? escena.escena : 'cierre';
+
+/* Recorrido por la home: posiciones medidas del sitio a 390 px de ancho. */
+var PARADAS = [
+  { t: 2.5, y: 0 },      // hero
+  { t: 3.7, y: 1880 },   // habitaciones
+  { t: 4.9, y: 3990 },   // servicios
+  { t: 6.6, y: 6050 },   // guías
+];
+
+function desplazamientoHome() {
+  if (t <= PARADAS[0].t) return 0;
+  for (var i = 0; i < PARADAS.length - 1; i++) {
+    var a = PARADAS[i], b = PARADAS[i + 1];
+    if (t < b.t) return entre(a.y, b.y, suave(tramo(a.t, b.t)));
+  }
+  return PARADAS[PARADAS.length - 1].y;
+}
+
+/* ------------------------------------------------------- Composición --- */
+var movil = document.getElementById('movil');
+var rotulo = document.getElementById('rotulo');
+var cierre = document.getElementById('cierre');
+var firma = document.getElementById('firma');
+
+var ESCALA = 1.42;
+var ANCHO = (390 + 28) * ESCALA;
+
+function colocarMovil(escala, arriba, opacidad) {
+  movil.style.transform = 'translateX(-50%) scale(' + escala + ')';
+  movil.style.top = arriba + 'px';
+  movil.style.opacity = opacidad;
+}
+
+// Entrada del móvil: sube y aparece durante el primer segundo y medio.
+var entrada = suave(tramo(0, 1.5));
+var salida = suave(tramo(13.4, 14.4));           // se retira en el cierre
+var arriba = entre(540, 438, entrada) + salida * 260;
+colocarMovil(ESCALA * entre(0.94, 1, entrada) * entre(1, 0.92, salida), arriba, entrada * (1 - salida));
+
+/* Rótulos por escena. */
+var ROTULOS = [
+  { desde: 0.6, hasta: 2.5, ante: 'Demo de diseño web',
+    titulo: 'Una web de hotel<br>que <em>sí reserva</em>' },
+  { desde: 2.8, hasta: 6.5, ante: 'Sin plantillas',
+    titulo: 'Diseño propio,<br>hecho a medida' },
+  { desde: 6.9, hasta: 10.9, ante: 'Motor de reservas',
+    titulo: 'Reserva directa<br>en <em>tres pasos</em>' },
+  { desde: 11.3, hasta: 13.9, ante: 'Atención al huésped',
+    titulo: 'Agente de WhatsApp<br>integrado' },
+];
+
+var activo = null;
+ROTULOS.forEach(function (r) { if (t >= r.desde - 0.5 && t <= r.hasta + 0.1) activo = r; });
+
+if (activo && escena !== 'cierre') {
+  var op = visible(activo.desde, activo.hasta);
+  rotulo.style.opacity = op;
+  rotulo.style.top = (150 - (1 - op) * 26) + 'px';
+  rotulo.innerHTML =
+    '<div class="rotulo__ante">' + activo.ante + '</div>' +
+    '<div class="rotulo__titulo">' + activo.titulo + '</div>';
+} else {
+  rotulo.style.opacity = 0;
+}
+
+firma.style.opacity = escena === 'cierre' ? 0 : 0.85 * entrada;
+
+/* Tarjeta de cierre. */
+if (t >= 13.6) {
+  var oc = suave(tramo(13.9, 14.9));
+  cierre.style.display = 'grid';
+  cierre.style.opacity = oc;
+  var acerca = 1 + 0.035 * suave(tramo(13.9, 18));
+  var sube = -14 * suave(tramo(13.9, 18));
+  cierre.innerHTML =
+    '<div style="transform:scale(' + acerca.toFixed(4) + ') translateY(' + sube.toFixed(2) + 'px)">' +
+    '<div class="cierre__marca">Almara</div>' +
+    '<div class="cierre__lugar">Tarifa · Cádiz</div>' +
+    '<div class="cierre__filete"></div>' +
+    '<div class="cierre__pregunta">¿Quieres una web<br>así para <em>tu negocio</em>?</div>' +
+    '<div class="cierre__cta" style="transform:scale(' +
+      (1 + 0.018 * Math.sin((t - 14.2) * 2.4)).toFixed(4) + ')">Escríbeme</div>' +
+    '</div>';
+}
+
+/* ------------------------------------------------ Estado dentro del móvil --- */
+var marco = document.getElementById('marco');
+var pagina = escena === 'reserva' ? '/reserva.html' : '/index.html';
+var listo = false;
+
+marco.addEventListener('load', function () {
+  var d = marco.contentDocument;
+  var w = marco.contentWindow;
+  if (!d || !d.head) return;
+
+  // Congelamos animaciones y revelados: cada fotograma debe ser determinista.
+  var estilo = d.createElement('style');
+  estilo.textContent =
+    'html{scroll-behavior:auto!important}' +
+    '*,*::before,*::after{animation:none!important;transition:none!important}' +
+    '.js .aparece{opacity:1!important;transform:none!important}' +
+    '.hero__fondo{transform:none!important}';
+  d.head.appendChild(estilo);
+
+  if (escena === 'reserva') prepararReserva(d, w);
+  else if (escena === 'whatsapp') prepararWhatsApp(d, w);
+  else w.scrollTo(0, desplazamientoHome());
+
+  listo = true;
+  document.title = 'listo';
+});
+
+function prepararReserva(d, w) {
+  var paso = t < 8.3 ? 1 : t < 9.5 ? 2 : t < 10.3 ? 3 : 4;
+
+  if (paso >= 2) {
+    d.querySelector('[data-elegir="suite-almara"]').click();
+    d.querySelector('#h-nombre').value = 'Lucía';
+    d.querySelector('#h-apellidos').value = 'Ferrer';
+    d.querySelector('#h-correo').value = 'lucia@ejemplo.com';
+    d.querySelector('#h-telefono').value = '600 12 34 56';
+    d.querySelector('#h-condiciones').checked = true;
+  }
+  if (paso >= 3) {
+    d.querySelector('#form-huesped').dispatchEvent(new w.Event('submit', { cancelable: true }));
+    d.querySelector('#p-titular').value = 'LUCÍA FERRER';
+    var n = d.querySelector('#p-numero');
+    n.value = '4242424242424242'; n.dispatchEvent(new w.Event('input'));
+    var c = d.querySelector('#p-caducidad');
+    c.value = '0630'; c.dispatchEvent(new w.Event('input'));
+    d.querySelector('#p-cvc').value = '123';
+  }
+  if (paso >= 4) {
+    // Saltamos la espera simulada del pago para no depender de temporizadores.
+    d.querySelectorAll('[data-paso]').forEach(function (s) {
+      s.hidden = s.getAttribute('data-paso') !== '4';
+    });
+    d.querySelector('#pasos').hidden = true;
+    d.querySelector('#localizador').textContent = 'ALM-482913';
+    d.querySelector('#confirmacion-detalle').innerHTML =
+      '<div class="resumen__linea"><span>Habitación</span><span>Suite Almara</span></div>' +
+      '<div class="resumen__linea"><span>Entrada</span><span>vie, 12 jun · desde las 15:00</span></div>' +
+      '<div class="resumen__linea"><span>Salida</span><span>lun, 15 jun · hasta las 12:00</span></div>' +
+      '<div class="resumen__linea resumen__linea--fuerte"><span>Total</span><span>1.060,44 €</span></div>';
+  }
+
+  var objetivo = d.querySelector('[data-paso="' + paso + '"]');
+  var y = objetivo ? objetivo.getBoundingClientRect().top + d.documentElement.scrollTop - 96 : 0;
+  var TRAMOS = { 1: [6.6, 8.3, 210, 660], 2: [8.3, 9.5, 0, 150], 3: [9.5, 10.3, 0, 170], 4: [10.3, 11.0, 0, 90] };
+  var tr = TRAMOS[paso];
+  y += entre(tr[2], tr[3], suave(tramo(tr[0], tr[1])));
+  w.scrollTo(0, Math.max(0, y));
+}
+
+function prepararWhatsApp(d, w) {
+  w.scrollTo(0, entre(2050, 2360, suave(tramo(11.0, 14.0))));
+  var burbuja = d.querySelector('.agente__burbuja');
+  if (burbuja) burbuja.click();
+
+  // El pulso se dibuja según el fotograma, ya que las animaciones están congeladas.
+  var fase = ((t - 11.0) / 2.6) % 1;
+  d.querySelectorAll('.agente__pulso').forEach(function (anillo, i) {
+    var p = (fase + i * 0.5) % 1;
+    anillo.style.transform = 'scale(' + (1 + p * 0.7) + ')';
+    anillo.style.opacity = Math.max(0, 0.7 * (1 - p / 0.7));
+  });
+}
+
+marco.src = pagina;
+</script>
+</body>
+</html>
