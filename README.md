@@ -43,8 +43,17 @@ o publicar con un enlace.
 Presente en todas las páginas, en la esquina inferior derecha. Burbuja circular
 con avatar y animación de pulso; al pulsar abre un panel de chat con el mensaje
 predefinido *«Hola, soy el asistente de Hotel Almara 🌊 ¿En qué puedo ayudarte
-con tu reserva?»* y un enlace a `wa.me` con el texto ya escrito. El número
-(`34600123456`, en `assets/js/almara.js`) es de demostración.
+con tu reserva?»*.
+
+**La conversación se resuelve dentro de la propia web.** Las sugerencias
+escriben la pregunta del visitante y el asistente responde tras un indicador de
+«escribiendo…». No hay ningún enlace saliente ni número de teléfono asociado:
+una demo no debe mandar los clics de nadie a un número que no es suyo. Por el
+mismo motivo el teléfono del pie se muestra como texto y no como enlace `tel:`.
+
+Al implantarlo en un hotel real, es en `SUGERENCIAS` (en `assets/js/almara.js`)
+donde se sustituyen las respuestas de ejemplo por la conexión a su cuenta de
+WhatsApp Business.
 
 ## Imágenes
 
@@ -113,5 +122,6 @@ tools/            generador de las ilustraciones y del vídeo para redes
 
 - **Colores y tipografías:** las variables al principio de `assets/css/almara.css`.
 - **Habitaciones y precios:** la constante `HABITACIONES` en `assets/js/almara.js`.
-- **Contacto y WhatsApp:** la constante `CONTACTO` en `assets/js/almara.js`.
+- **Contacto:** la constante `CONTACTO` en `assets/js/almara.js`.
+- **Respuestas del asistente:** la constante `SUGERENCIAS` en `assets/js/almara.js`.
 - **Puntos del mapa:** la constante `PUNTOS` en `assets/js/almara.js`.

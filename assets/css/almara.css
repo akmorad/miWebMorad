@@ -850,6 +850,11 @@ ul { margin: 0; padding: 0; list-style: none; }
   background: #ece5dd url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 20h40M20 0v40' stroke='%23dfd7cd' stroke-width='.5'/%3E%3C/svg%3E");
   padding: 1.1rem 1rem;
   min-height: 132px;
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
 }
 .agente__mensaje {
   background: #fff;
@@ -862,10 +867,37 @@ ul { margin: 0; padding: 0; list-style: none; }
   max-width: 90%;
 }
 .agente__hora { display: block; font-size: 0.64rem; color: #8d8d8d; text-align: right; margin-top: 0.3rem; }
+
+/* Mensajes del visitante: verde claro y alineados a la derecha, como en WhatsApp. */
+.agente__mensaje--mio {
+  background: #d9fdd3;
+  border-radius: 10px 2px 10px 10px;
+  align-self: flex-end;
+}
+
+/* Indicador de "escribiendo…" mientras llega la respuesta. */
+.agente__escribiendo { display: flex; gap: 5px; align-items: center; width: max-content; padding: 0.85rem; }
+.agente__escribiendo span {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #9aa0a6;
+  animation: puntos 1.3s ease-in-out infinite;
+}
+.agente__escribiendo span:nth-child(2) { animation-delay: 0.18s; }
+.agente__escribiendo span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes puntos {
+  0%, 60%, 100% { opacity: 0.35; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+
+.agente__nota {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--texto-suave);
+  text-align: center;
+}
 .agente__pie { padding: 0.9rem 1rem 1.1rem; }
-.agente__pie .boton { background: #25d366; color: #fff; box-shadow: none; }
-.agente__pie .boton:hover { background: #1eb85a; color: #fff; }
-.agente__sugerencias { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
+.agente__sugerencias { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.7rem; }
 .agente__sugerencia {
   font-size: 0.74rem;
   border: 1px solid var(--linea);
@@ -878,6 +910,8 @@ ul { margin: 0; padding: 0; list-style: none; }
   transition: border-color var(--transicion), color var(--transicion);
 }
 .agente__sugerencia:hover { border-color: var(--terracota); color: var(--terracota-osc); }
+.agente__sugerencia:disabled { opacity: 0.4; cursor: default; }
+.agente__sugerencia:disabled:hover { border-color: var(--linea); color: var(--texto); }
 
 /* --------------------------------------------- Aparición al hacer scroll --- */
 

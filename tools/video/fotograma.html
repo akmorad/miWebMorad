@@ -286,6 +286,12 @@ function prepararWhatsApp(d, w) {
   var burbuja = d.querySelector('.agente__burbuja');
   if (burbuja) burbuja.click();
 
+  // A media escena el visitante pulsa una sugerencia y el agente responde.
+  if (t >= 12.1) {
+    var chip = d.querySelectorAll('.agente__sugerencia')[2];
+    if (chip) chip.click();
+  }
+
   // El pulso se dibuja según el fotograma, ya que las animaciones están congeladas.
   var fase = ((t - 11.0) / 2.6) % 1;
   d.querySelectorAll('.agente__pulso').forEach(function (anillo, i) {

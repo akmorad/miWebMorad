@@ -15,7 +15,6 @@
 
   var CONTACTO = {
     telefono: '+34 956 68 12 40',
-    whatsapp: '34600123456', // número de demostración
     correo: 'reservas@hotelalmara.es',
     direccion: 'Paseo de la Alameda 12, 11380 Tarifa, Cádiz',
   };
@@ -265,15 +264,31 @@
 
   var SALUDO = 'Hola, soy el asistente de Hotel Almara 🌊 ¿En qué puedo ayudarte con tu reserva?';
 
+  /*
+   * El chat se resuelve dentro de la propia web: no enlaza a ningún número.
+   * En una implantación real, aquí es donde se conectaría la cuenta de
+   * WhatsApp Business del hotel.
+   */
   var SUGERENCIAS = [
-    { texto: 'Ver disponibilidad', mensaje: 'Hola, quería consultar disponibilidad para mis fechas.' },
-    { texto: 'Precios y ofertas', mensaje: 'Hola, ¿qué tarifas tenéis disponibles?' },
-    { texto: 'Cómo llegar', mensaje: 'Hola, ¿cómo llego al hotel desde el aeropuerto de Jerez?' },
+    {
+      texto: 'Ver disponibilidad',
+      pregunta: '¿Tenéis habitaciones libres este puente?',
+      respuesta: 'Sí, todavía quedan. La Habitación Vista Mar sale desde 120 € y la Suite Almara desde 220 €. ' +
+        'Si me dices tus fechas te confirmo el precio exacto.',
+    },
+    {
+      texto: 'Precios y ofertas',
+      pregunta: '¿Sale más barato reservar aquí?',
+      respuesta: 'Siempre. Reservando en la web no hay comisión de intermediarios, y la cancelación es ' +
+        'gratuita hasta 48 horas antes de la llegada.',
+    },
+    {
+      texto: 'Cómo llegar',
+      pregunta: '¿Cómo llego desde el aeropuerto de Jerez?',
+      respuesta: 'Son 120 km, alrededor de hora y media por la A-381 y la N-340. Te organizamos el ' +
+        'traslado privado por 95 € por trayecto si lo prefieres.',
+    },
   ];
-
-  function enlaceWhatsApp(mensaje) {
-    return 'https://wa.me/' + CONTACTO.whatsapp + '?text=' + encodeURIComponent(mensaje);
-  }
 
   function iniciarAgente() {
     if ($('.agente')) return;
@@ -303,8 +318,7 @@
         return '<button type="button" class="agente__sugerencia" data-mensaje="' + s.mensaje + '">' + s.texto + '</button>';
       }).join(''),
       '    </div>',
-      '    <a class="boton boton--principal boton--bloque" href="' + enlaceWhatsApp(SUGERENCIAS[0].mensaje) + '"',
-      '       target="_blank" rel="noopener" data-enlace-whatsapp>Continuar en WhatsApp</a>',
+      '    <p class="agente__nota">Demostración: el chat funciona aquí mismo, sin salir de la web.</p>',
       '  </div>',
       '</div>',
       '<div class="agente__aviso" hidden>' + SALUDO + '</div>',
@@ -323,7 +337,7 @@
     var panel = $('.agente__panel', contenedor);
     var aviso = $('.agente__aviso', contenedor);
     var cerrar = $('.agente__cerrar', contenedor);
-    var enlace = $('[data-enlace-whatsapp]', contenedor);
+    var conversacion = $('.agente__conversacion', contenedor);
 
     // El estado vive en una variable, no en las clases del DOM: así no depende
     // de que la animación llegue a ejecutarse.
@@ -339,8 +353,8 @@
         panel.classList.add('agente__panel--abierto');
         aviso.hidden = true;
         aviso.classList.remove('agente__aviso--visible');
-        var primera = $('.agente__sugerencia', panel);
-        if (primera) primera.focus();
+        panel.setAttribute('tabindex', '-1');
+        panel.focus({ preventScroll: true });
       } else {
         panel.classList.remove('agente__panel--abierto');
         cierre = window.setTimeout(function () { panel.classList.remove('agente__panel--montado'); }, 420);
@@ -358,12 +372,42 @@
       }
     });
 
-    $$('.agente__sugerencia', contenedor).forEach(function (boton) {
+    function ahora() {
+      return new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function anadirMensaje(texto, mio) {
+      var burbujaMensaje = document.createElement('div');
+      burbujaMensaje.className = 'agente__mensaje' + (mio ? ' agente__mensaje--mio' : '');
+      burbujaMensaje.innerHTML = texto + '<span class="agente__hora">' + ahora() + '</span>';
+      conversacion.appendChild(burbujaMensaje);
+      conversacion.scrollTop = conversacion.scrollHeight;
+      return burbujaMensaje;
+    }
+
+    var respondiendo = false;
+
+    $$('.agente__sugerencia', contenedor).forEach(function (boton, indice) {
       boton.addEventListener('click', function () {
-        enlace.setAttribute('href', enlaceWhatsApp(boton.getAttribute('data-mensaje')));
-        $$('.agente__sugerencia', contenedor).forEach(function (b) { b.style.borderColor = ''; b.style.color = ''; });
-        boton.style.borderColor = 'var(--terracota)';
-        boton.style.color = 'var(--terracota-osc)';
+        if (respondiendo) return;
+        respondiendo = true;
+        var s = SUGERENCIAS[indice];
+        boton.disabled = true;
+        anadirMensaje(s.pregunta, true);
+
+        // Indicador de "escribiendo…" antes de la respuesta: da la sensación
+        // de conversación real sin necesidad de servidor.
+        var escribiendo = document.createElement('div');
+        escribiendo.className = 'agente__mensaje agente__escribiendo';
+        escribiendo.innerHTML = '<span></span><span></span><span></span>';
+        conversacion.appendChild(escribiendo);
+        conversacion.scrollTop = conversacion.scrollHeight;
+
+        window.setTimeout(function () {
+          escribiendo.remove();
+          anadirMensaje(s.respuesta, false);
+          respondiendo = false;
+        }, 1100);
       });
     });
 
@@ -570,6 +614,5 @@
     disponibilidad: disponibilidad,
     leerEstado: leerEstado,
     guardarEstado: guardarEstado,
-    enlaceWhatsApp: enlaceWhatsApp,
   };
 })();
