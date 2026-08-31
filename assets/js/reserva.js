@@ -383,4 +383,38 @@
   } else {
     arrancar();
   }
+
+  /*
+   * Superficie pública mínima. La usa el paquete de un solo archivo, donde la
+   * landing no se recarga al navegar y hay que avisarla de que el estado
+   * (fechas, huéspedes o habitación) ha cambiado por fuera.
+   */
+  window.AlmaraReserva = {
+    /** Vuelve a leer el estado guardado y repinta precios y resumen. */
+    recargar: function () {
+      var nuevo = A.leerEstado();
+      estado.entrada = nuevo.entrada;
+      estado.salida = nuevo.salida;
+      estado.huespedes = nuevo.huespedes;
+      if (nuevo.habitacion) estado.habitacion = nuevo.habitacion;
+      if (form) {
+        var e = $('[name="entrada"]', form);
+        var s = $('[name="salida"]', form);
+        var h = $('[name="huespedes"]', form);
+        if (e) e.value = estado.entrada;
+        if (s) s.value = estado.salida;
+        if (h) h.value = String(estado.huespedes);
+      }
+      pintarOpciones();
+      pintarResumen();
+    },
+    /** Selecciona una habitación y avanza al paso de datos del huésped. */
+    elegir: function (id) {
+      estado.habitacion = id;
+      A.guardarEstado(estado);
+      pintarOpciones();
+      pintarResumen();
+      irAPaso(2);
+    },
+  };
 })();

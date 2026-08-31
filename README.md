@@ -70,6 +70,19 @@ El resultado ya está en el repositorio, así que solo hace falta ejecutarlo si 
 retocan las escenas. Al ser vectoriales, pesan pocos kilobytes y se ven nítidas
 en cualquier pantalla.
 
+## Versión de un solo archivo
+
+Para enviar la demo por correo o publicarla donde solo se admite una página:
+
+```bash
+python3 tools/empaquetar.py     # -> hotel-almara.html (~1,2 MB)
+```
+
+Mete las ocho páginas, los estilos, el JavaScript y las quince ilustraciones en
+un único HTML autónomo, con un enrutador por hash (`#/`, `#/reserva`,
+`#/guias/playas`…). No necesita servidor: se abre con doble clic y no pide
+nada a la red salvo las tipografías.
+
 ## Vídeo para redes
 
 `tools/video/` genera un vídeo vertical de 1080×1920 con la demo, listo para
@@ -103,7 +116,7 @@ guias/            cuatro artículos de guía local
 assets/css/       almara.css — sistema visual completo
 assets/js/        almara.js (común) y reserva.js (flujo de reserva)
 assets/img/       15 ilustraciones SVG originales
-tools/            generador de las ilustraciones y del vídeo para redes
+tools/            generadores: ilustraciones, vídeo para redes y archivo único
 ```
 
 ## Decisiones técnicas

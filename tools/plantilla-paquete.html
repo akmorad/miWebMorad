@@ -1,0 +1,121 @@
+<meta charset="utf-8">
+<title>Hotel Almara</title>
+<meta name="description" content="Hotel boutique frente al mar en Tarifa, Cádiz. Demostración de diseño web con motor de reservas y asistente de chat.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/*CSS*/
+
+/* --- Añadidos propios del paquete de un solo archivo --- */
+.pagina[hidden] { display: none !important; }
+</style>
+
+<a class="salta-al-contenido" href="#/?ir=contenido">Saltar al contenido</a>
+
+<!--CABECERA-->
+
+<main id="contenido">
+<!--PAGINAS-->
+</main>
+
+<!--PIE-->
+
+<script>
+window.ALMARA_IMG = /*IMG*/;
+</script>
+
+<script>
+/*JS_COMUN*/
+</script>
+
+<script>
+/*JS_RESERVA*/
+</script>
+
+<script>
+/* ==========================================================================
+   Enrutador del paquete de un solo archivo.
+   Las ocho páginas viven en el mismo documento; aquí se muestra una cada vez.
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var paginas = Array.prototype.slice.call(document.querySelectorAll('.pagina'));
+  var cabecera = document.querySelector('.cabecera');
+
+  function partes() {
+    var bruto = location.hash.replace(/^#/, '') || '/';
+    var corte = bruto.indexOf('?');
+    var ruta = corte < 0 ? bruto : bruto.slice(0, corte);
+    var consulta = corte < 0 ? '' : bruto.slice(corte + 1);
+    return { ruta: ruta || '/', params: new URLSearchParams(consulta) };
+  }
+
+  function mostrar() {
+    var p = partes();
+    var elegida = null;
+    paginas.forEach(function (pagina) {
+      var suya = pagina.getAttribute('data-ruta') === p.ruta;
+      pagina.hidden = !suya;
+      if (suya) elegida = pagina;
+    });
+    if (!elegida) {
+      elegida = paginas[0];
+      elegida.hidden = false;
+    }
+
+    document.title = elegida.getAttribute('data-titulo') || 'Hotel Almara';
+
+    // La cabecera es transparente solo sobre el hero de la portada.
+    var conHero = !!elegida.querySelector('.hero');
+    cabecera.classList.toggle('cabecera--sobre-hero', conHero);
+    if (!conHero) cabecera.classList.add('cabecera--fija');
+
+    // Enlace activo de la navegación.
+    Array.prototype.forEach.call(document.querySelectorAll('.navegacion__enlace'), function (a) {
+      var destino = (a.getAttribute('href') || '').replace(/^#/, '').split('?')[0];
+      if (destino === p.ruta && p.ruta !== '/') a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+
+    // Con la página oculta el observador de scroll no llega a dispararse.
+    Array.prototype.forEach.call(elegida.querySelectorAll('.aparece'), function (el) {
+      el.classList.add('aparece--visible');
+    });
+
+    /*
+     * La landing de reserva no se recarga al navegar, así que hay que avisarla
+     * de que las fechas o la habitación han cambiado por fuera.
+     */
+    var habitacion = p.params.get('habitacion');
+    var saltarScroll = false;
+    if (elegida.getAttribute('data-ruta') === '/reserva' && window.AlmaraReserva) {
+      if (habitacion) {
+        try {
+          var guardado = JSON.parse(window.sessionStorage.getItem('almara:reserva') || '{}');
+          guardado.habitacion = habitacion;
+          window.sessionStorage.setItem('almara:reserva', JSON.stringify(guardado));
+        } catch (e) { /* sin almacenamiento */ }
+      }
+      window.AlmaraReserva.recargar();
+      if (habitacion) {
+        window.AlmaraReserva.elegir(habitacion);
+        saltarScroll = true;
+      }
+    }
+
+    var ancla = p.params.get('ir');
+    var destino = ancla ? elegida.querySelector('#' + CSS.escape(ancla)) : null;
+    if (destino) {
+      window.scrollTo({ top: destino.getBoundingClientRect().top + window.scrollY - 90, behavior: 'auto' });
+    } else if (!saltarScroll) {
+      window.scrollTo(0, 0);
+    }
+    window.dispatchEvent(new Event('scroll'));
+  }
+
+  window.addEventListener('hashchange', mostrar);
+  mostrar();
+})();
+</script>
