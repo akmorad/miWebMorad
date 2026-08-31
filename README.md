@@ -76,6 +76,16 @@ Cada fotograma se calcula solo a partir de su número (`fotograma.html?f=N`), as
 que el render es reproducible y se paraleliza. Para cambiar los rótulos o los
 tiempos, edita las constantes `GUION`, `PARADAS` y `ROTULOS` de `fotograma.html`.
 
+Para añadir la locución en español:
+
+```bash
+python3 tools/video/locucion.py hotel-almara-reel.mp4
+```
+
+Las frases y sus tiempos están en `LINEAS`, dentro de `locucion.py`; el script
+avisa si alguna no cabe en su escena. La voz es sintética: para un acabado más
+cálido, graba tú las mismas frases y sustituye los audios.
+
 ## Estructura
 
 ```
