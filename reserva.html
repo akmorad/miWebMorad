@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reservar — Hotel Almara | Tarifa, Cádiz</title>
+<meta name="description" content="Reserva directa en Hotel Almara: elige fechas, compara habitaciones con precio en tiempo real y confirma en tres pasos. Mejor precio garantizado y cancelación gratuita.">
+<meta name="theme-color" content="#c2694a">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/almara.css">
+</head>
+<body data-base="">
+
+<a class="salta-al-contenido" href="#contenido">Saltar al contenido</a>
+
+<header class="cabecera cabecera--fija">
+  <div class="cabecera__interior">
+    <a class="marca" href="index.html" aria-label="Hotel Almara, inicio">
+      <img class="marca__icono" src="assets/img/marca.svg" alt="" width="34" height="34">
+      <span class="marca__texto">
+        <span class="marca__nombre">Almara</span>
+        <span class="marca__lugar">Tarifa · Cádiz</span>
+      </span>
+    </a>
+    <nav class="navegacion" aria-label="Principal">
+      <ul class="navegacion__lista">
+        <li><a class="navegacion__enlace" href="habitaciones.html">Habitaciones</a></li>
+        <li><a class="navegacion__enlace" href="index.html#servicios">Servicios</a></li>
+        <li><a class="navegacion__enlace" href="guias.html">Guías locales</a></li>
+        <li><a class="navegacion__enlace" href="index.html#ubicacion">Ubicación</a></li>
+        <li><a class="boton boton--principal boton--pequeno" href="reserva.html" aria-current="page">Reservar</a></li>
+      </ul>
+      <a class="boton boton--principal boton--pequeno" href="reserva.html" aria-current="page">Reservar</a>
+      <button class="menu-boton" type="button" aria-expanded="false" aria-label="Abrir el menú">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main id="contenido" class="reserva">
+  <div class="contenedor">
+
+    <div class="cabecera-seccion" style="margin-bottom:2rem">
+      <span class="antetitulo">Reserva directa</span>
+      <hr class="filete">
+      <h1 style="font-size:clamp(2.1rem,4vw,3rem)">Tu estancia en Almara</h1>
+      <p class="entradilla">
+        Reservando en esta web pagas siempre menos que en cualquier portal, sin comisiones
+        de intermediarios y con cancelación gratuita hasta 48 horas antes.
+      </p>
+    </div>
+
+    <!-- Indicador de los tres pasos -->
+    <ol class="pasos" id="pasos" aria-label="Progreso de la reserva">
+      <li class="paso paso--activo" data-indicador="1">
+        <span class="paso__numero">1</span>
+        <span class="paso__texto">Elegir habitación</span>
+      </li>
+      <li class="paso__union" aria-hidden="true"></li>
+      <li class="paso" data-indicador="2">
+        <span class="paso__numero">2</span>
+        <span class="paso__texto">Datos del huésped</span>
+      </li>
+      <li class="paso__union" aria-hidden="true"></li>
+      <li class="paso" data-indicador="3">
+        <span class="paso__numero">3</span>
+        <span class="paso__texto">Pago</span>
+      </li>
+    </ol>
+
+    <div class="reserva__cuerpo">
+      <!-- ------------------------------------------------ Columna principal -->
+      <div>
+
+        <!-- Paso 1: fechas y comparativa de habitaciones -->
+        <section data-paso="1" aria-labelledby="t-paso1">
+          <div class="panel">
+            <form class="buscador buscador--panel" data-buscador id="buscador-reserva" aria-label="Fechas y huéspedes">
+              <div class="campo">
+                <label class="campo__etiqueta" for="r-entrada">Entrada</label>
+                <input type="date" id="r-entrada" name="entrada" required>
+              </div>
+              <div class="campo">
+                <label class="campo__etiqueta" for="r-salida">Salida</label>
+                <input type="date" id="r-salida" name="salida" required>
+              </div>
+              <div class="campo campo--select">
+                <label class="campo__etiqueta" for="r-huespedes">Huéspedes</label>
+                <select id="r-huespedes" name="huespedes">
+                  <option value="1">1 huésped</option>
+                  <option value="2" selected>2 huéspedes</option>
+                  <option value="3">3 huéspedes</option>
+                  <option value="4">4 huéspedes</option>
+                </select>
+              </div>
+              <button class="boton boton--contorno" type="submit">Actualizar precios</button>
+            </form>
+          </div>
+
+          <div class="panel">
+            <div class="panel__titulo">
+              <h2 id="t-paso1">Habitaciones disponibles</h2>
+              <p id="resumen-busqueda" style="font-size:.84rem;color:var(--texto-suave);margin:0"></p>
+            </div>
+            <div id="opciones"></div>
+          </div>
+        </section>
+
+        <!-- Paso 2: datos del huésped -->
+        <section data-paso="2" hidden aria-labelledby="t-paso2">
+          <div class="panel">
+            <div class="panel__titulo"><h2 id="t-paso2">Datos del huésped</h2></div>
+            <form class="formulario" id="form-huesped" novalidate>
+              <div class="fila">
+                <div class="campo-caja">
+                  <label for="h-nombre">Nombre</label>
+                  <input type="text" id="h-nombre" name="nombre" autocomplete="given-name" required>
+                  <span class="campo-caja__error" data-error-de="h-nombre"></span>
+                </div>
+                <div class="campo-caja">
+                  <label for="h-apellidos">Apellidos</label>
+                  <input type="text" id="h-apellidos" name="apellidos" autocomplete="family-name" required>
+                  <span class="campo-caja__error" data-error-de="h-apellidos"></span>
+                </div>
+              </div>
+              <div class="fila">
+                <div class="campo-caja">
+                  <label for="h-correo">Correo electrónico</label>
+                  <input type="email" id="h-correo" name="correo" autocomplete="email" required>
+                  <span class="campo-caja__error" data-error-de="h-correo"></span>
+                </div>
+                <div class="campo-caja">
+                  <label for="h-telefono">Teléfono</label>
+                  <input type="tel" id="h-telefono" name="telefono" autocomplete="tel" required>
+                  <span class="campo-caja__error" data-error-de="h-telefono"></span>
+                </div>
+              </div>
+              <div class="fila">
+                <div class="campo-caja">
+                  <label for="h-pais">País de residencia</label>
+                  <select id="h-pais" name="pais">
+                    <option>España</option><option>Francia</option><option>Alemania</option>
+                    <option>Reino Unido</option><option>Italia</option><option>Países Bajos</option>
+                    <option>Portugal</option><option>Otro</option>
+                  </select>
+                </div>
+                <div class="campo-caja">
+                  <label for="h-llegada">Hora estimada de llegada</label>
+                  <select id="h-llegada" name="llegada">
+                    <option>Entre 14:00 y 16:00</option>
+                    <option>Entre 16:00 y 19:00</option>
+                    <option>Entre 19:00 y 22:00</option>
+                    <option>Después de las 22:00</option>
+                  </select>
+                </div>
+              </div>
+              <div class="campo-caja">
+                <label for="h-peticiones">Peticiones especiales (opcional)</label>
+                <textarea id="h-peticiones" name="peticiones" placeholder="Cuna, cama supletoria, alergias, hora de llegada tardía…"></textarea>
+              </div>
+              <label class="casilla">
+                <input type="checkbox" id="h-condiciones" name="condiciones" required>
+                <span>He leído y acepto la política de cancelación y el tratamiento de mis datos.</span>
+              </label>
+              <span class="campo-caja__error" data-error-de="h-condiciones"></span>
+
+              <div class="acciones-formulario">
+                <button class="boton boton--contorno" type="button" data-volver="1">Volver a las habitaciones</button>
+                <button class="boton boton--principal" type="submit">Continuar al pago</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Paso 3: pago -->
+        <section data-paso="3" hidden aria-labelledby="t-paso3">
+          <div class="panel">
+            <div class="panel__titulo">
+              <h2 id="t-paso3">Pago seguro</h2>
+              <p style="font-size:.84rem;color:var(--texto-suave);margin:0">Cifrado TLS de 256 bits</p>
+            </div>
+
+            <form class="formulario" id="form-pago" novalidate>
+              <div class="campo-caja">
+                <label for="p-titular">Titular de la tarjeta</label>
+                <input type="text" id="p-titular" name="titular" autocomplete="cc-name" required>
+                <span class="campo-caja__error" data-error-de="p-titular"></span>
+              </div>
+              <div class="campo-caja">
+                <label for="p-numero">Número de tarjeta</label>
+                <input type="text" id="p-numero" name="numero" inputmode="numeric" autocomplete="cc-number"
+                       placeholder="4242 4242 4242 4242" maxlength="23" required>
+                <span class="campo-caja__error" data-error-de="p-numero"></span>
+              </div>
+              <div class="fila">
+                <div class="campo-caja">
+                  <label for="p-caducidad">Caducidad</label>
+                  <input type="text" id="p-caducidad" name="caducidad" inputmode="numeric" autocomplete="cc-exp"
+                         placeholder="MM/AA" maxlength="5" required>
+                  <span class="campo-caja__error" data-error-de="p-caducidad"></span>
+                </div>
+                <div class="campo-caja">
+                  <label for="p-cvc">CVC</label>
+                  <input type="text" id="p-cvc" name="cvc" inputmode="numeric" autocomplete="cc-csc"
+                         placeholder="123" maxlength="4" required>
+                  <span class="campo-caja__error" data-error-de="p-cvc"></span>
+                </div>
+              </div>
+
+              <div class="politica">
+                <strong>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                  Cancelación gratuita hasta 48 horas antes
+                </strong>
+                Hoy no se te cobra nada: el importe se carga en el momento de la llegada.
+                Si cancelas con menos de 48 horas se cobra la primera noche.
+              </div>
+
+              <p style="font-size:.8rem;color:var(--texto-suave);margin:0">
+                Demostración: no se procesa ningún pago real ni se envía ningún dato a servidor alguno.
+              </p>
+
+              <div class="acciones-formulario">
+                <button class="boton boton--contorno" type="button" data-volver="2">Volver a mis datos</button>
+                <button class="boton boton--principal" type="submit" id="boton-pagar">Confirmar reserva</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Confirmación -->
+        <section data-paso="4" hidden aria-labelledby="t-paso4">
+          <div class="panel">
+            <div class="confirmacion">
+              <div class="confirmacion__marca" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 6 9 17l-5-5"/></svg>
+              </div>
+              <h2 id="t-paso4">Reserva confirmada</h2>
+              <p class="entradilla" style="margin-inline:auto">
+                Te hemos enviado la confirmación por correo. Nos vemos muy pronto en Tarifa.
+              </p>
+              <p class="confirmacion__localizador" id="localizador">ALM-000000</p>
+              <div id="confirmacion-detalle" style="max-width:420px;margin-inline:auto;text-align:left"></div>
+              <p style="margin-top:2rem">
+                <a class="boton boton--contorno" href="index.html">Volver al inicio</a>
+                <a class="boton boton--principal" href="guias.html">Preparar el viaje</a>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sellos de confianza -->
+        <div class="sellos sellos--fila">
+          <div class="sello">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+              <rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+            </svg>
+            <span><strong>Pago 100 % seguro</strong>Cifrado TLS y verificación 3D Secure.</span>
+          </div>
+          <div class="sello">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+              <path d="M12 3 4 6v6c0 5 3.4 8.4 8 9 4.6-.6 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/>
+            </svg>
+            <span><strong>Mejor precio garantizado</strong>Si lo encuentras más barato, te igualamos la tarifa.</span>
+          </div>
+          <div class="sello">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
+            </svg>
+            <span><strong>Cancelación gratuita</strong>Hasta 48 horas antes de la llegada, sin preguntas.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------------------------------------------------- Resumen fijo -->
+      <aside class="resumen" aria-label="Resumen de tu reserva">
+        <div class="resumen__caja">
+          <div class="resumen__medio">
+            <img id="resumen-imagen" src="assets/img/piscina-infinita.svg" alt="" width="1600" height="1000">
+          </div>
+          <div class="resumen__cuerpo">
+            <h3 id="resumen-habitacion">Elige una habitación</h3>
+            <p class="resumen__subtitulo" id="resumen-metros">Hotel Almara · Tarifa</p>
+
+            <div class="resumen__datos">
+              <div class="resumen__linea"><span>Entrada</span><span id="resumen-entrada">—</span></div>
+              <div class="resumen__linea"><span>Salida</span><span id="resumen-salida">—</span></div>
+              <div class="resumen__linea"><span>Huéspedes</span><span id="resumen-huespedes">—</span></div>
+            </div>
+
+            <div class="resumen__datos">
+              <div class="resumen__linea" id="linea-alojamiento"><span>Alojamiento</span><span>—</span></div>
+              <div class="resumen__linea"><span>IVA (10 %)</span><span id="resumen-iva">—</span></div>
+              <div class="resumen__linea"><span>Tasa turística</span><span id="resumen-tasa">—</span></div>
+            </div>
+
+            <div class="resumen__total">
+              <span>Total</span>
+              <strong id="resumen-total">—</strong>
+            </div>
+            <p class="resumen__nota">Impuestos incluidos. Sin gastos de gestión.</p>
+
+            <div class="politica">
+              <strong>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                Cancelación gratuita
+              </strong>
+              Hasta 48 horas antes de la llegada. Después se cobra la primera noche.
+              No se realiza ningún cargo hoy.
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer class="pie">
+  <div class="contenedor">
+    <div class="pie__legal" style="margin-top:0;border-top:0;padding-top:0">
+      <span>© <span data-anio>2026</span> Hotel Almara · Paseo de la Alameda 12, Tarifa (Cádiz) · +34 956 68 12 40</span>
+      <span><a href="index.html">Inicio</a> · <a href="habitaciones.html">Habitaciones</a> · <a href="guias.html">Guías</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/almara.js"></script>
+<script src="assets/js/reserva.js"></script>
+</body>
+</html>
